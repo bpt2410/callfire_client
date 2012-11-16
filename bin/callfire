@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'callfire'
+require 'commandline'
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: callfire [options]"
+  opts.on('-s', '--sendcall [api_key campaign_id numbers]', 
+		'Send call to www.callfire.com service. 
+		Require api_key, campaign_id, numbers.
+		Format numbers : every number space ","') do |sendcall|
+    options[:sendcall] = sendcall.split(' ').map(&:to_sym) if sendcall
+  end
+  opts.on('-c', '--callback [api_key post_url campaign_id is_call]', 
+		'Set callback url for www.callfire.com service. 
+		Default is_call = false, campaign_id = null.
+		Require api_key, post_url
+		If campaign_id equal null : set callback for all campaign.
+		If campaign_id not equal null: set callback for campaign id.
+		If is_call equal true or 1 : set callback url when campaign finish.
+		If is_call equal false or 0: set callback url when call finish.') do |callback|
+    options[:callback] = callback.split(' ').map(&:to_sym) if callback
+  end
+  opts.on('-v', '--version') { puts "Callfire client v#{Callfire::VERSION}"; exit(0) }
+end.parse!
+
+Callfire::CommandLine.execute(options)
